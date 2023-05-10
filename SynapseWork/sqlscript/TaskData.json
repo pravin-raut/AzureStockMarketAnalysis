@@ -1,0 +1,20 @@
+{
+	"name": "TaskData",
+	"properties": {
+		"folder": {
+			"name": "Process"
+		},
+		"content": {
+			"query": "\nIF OBJECT_ID('TaskData', 'U') IS NOT NULL\n    DROP TABLE TaskData;\n\n\n\nCREATE TABLE TaskData\n(\n    TAKSK_ID INT IDENTITY(1,1) ,\n    TASK_NAME varchar(50),\n    FILE_DATE VARCHAR(50),\n    TASK_STATUS VARCHAR(50),\n    ROW_INS_TMS date,\n    ROW_UPD_TMS date\n);\n\n\nselect * from TaskData",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarketData",
+				"poolName": "StockMarketData"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

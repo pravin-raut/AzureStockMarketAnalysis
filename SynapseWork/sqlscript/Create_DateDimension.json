@@ -1,0 +1,20 @@
+{
+	"name": "Create_DateDimension",
+	"properties": {
+		"folder": {
+			"name": "Dimension"
+		},
+		"content": {
+			"query": "\nIF OBJECT_ID('DateDimension', 'U') IS NOT NULL\n    DROP TABLE DateDimension;\n\n\nCREATE TABLE dbo.DateDimension (\n    ActualDate DATE,\n    Day INT,\n    DayName NVARCHAR(50),\n    Week INT,\n    ISOWeek INT,\n    DayOfWeek INT,\n    Month INT,\n    MonthName NVARCHAR(50),\n    Quarter INT,\n    Year INT\n) WITH (\n    DISTRIBUTION = REPLICATE\n);\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarketData",
+				"poolName": "StockMarketData"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

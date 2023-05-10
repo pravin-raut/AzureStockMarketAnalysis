@@ -1,0 +1,20 @@
+{
+	"name": "Core_ActivityData",
+	"properties": {
+		"folder": {
+			"name": "Core Table"
+		},
+		"content": {
+			"query": "IF OBJECT_ID('Core_ActivityData', 'U') IS NOT NULL\n    DROP TABLE Core_ActivityData;\n\nCREATE TABLE Core_ActivityData (\n\t[SYMBOL] VARCHAR(50)\n\t,[SERIES] CHAR(10)\n\t,[STOCK_DATE] VARCHAR(15)\n\t,[PREV_CLOSE] DECIMAL(10, 2)\n\t,[OPEN_PRICE] DECIMAL(10, 2)\n\t,[HIGH_PRICE] DECIMAL(10, 2)\n\t,[LOW_PRICE] DECIMAL(10, 2)\n\t,[LAST_PRICE] DECIMAL(10, 2)\n\t,[CLOSE_PRICE] DECIMAL(10, 2)\n\t,[AVG_PRICE] DECIMAL(10, 2)\n\t,[TTL_TRD_QNTY] BIGINT\n\t,[TURNOVER_LACS] DECIMAL(10, 2)\n\t,[NO_OF_TRADES] BIGINT\n\t,[DELIV_QTY] BIGINT\n\t,[DELIV_PER] DECIMAL(10, 2)\n\t,ROW_INSRT_TMS datetime \n\t,ROW_UPDT_TMS datetime \n\t,ROW_INS_USR Varchar(20)\n\t,ROW_UPD_USR Varchar(20)\n)\nWITH (CLUSTERED COLUMNSTORE INDEX, DISTRIBUTION = HASH([SYMBOL]));\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarketData",
+				"poolName": "StockMarketData"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,20 @@
+{
+	"name": "Core_DailyPrice",
+	"properties": {
+		"folder": {
+			"name": "Core Table"
+		},
+		"content": {
+			"query": "\nIF OBJECT_ID('Core_DailyPrice', 'U') IS NOT NULL\n    DROP TABLE Core_DailyPrice;\n\nCREATE TABLE Core_DailyPrice (\n\t[SYMBOL] VARCHAR(50)\n\t,[SERIES] CHAR(10)\n\t,[OPEN] DECIMAL(10, 2)\n\t,[HIGH] DECIMAL(10, 2)\n\t,[LOW] DECIMAL(10, 2)\n\t,[CLOSE] DECIMAL(10, 2)\n\t,[LAST] DECIMAL(10, 2)\n\t,[PREVCLOSE] DECIMAL(10, 2)\n\t,[TOTTRDQTY] BIGINT\n\t,[TOTTRDVAL] DECIMAL(38, 2)\n\t,[STOCK_DATE] VARCHAR(15)\n\t,[TOTALTRADES] BIGINT\n\t,[ISIN] VARCHAR(50)\n\t,ROW_INSRT_TMS datetime \n\t,ROW_UPDT_TMS datetime \n\t,ROW_INS_USR Varchar(20)\n\t,ROW_UPD_USR Varchar(20)\n\n\t)\n    WITH (CLUSTERED COLUMNSTORE INDEX, DISTRIBUTION = HASH([SYMBOL]));\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarketData",
+				"poolName": "StockMarketData"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

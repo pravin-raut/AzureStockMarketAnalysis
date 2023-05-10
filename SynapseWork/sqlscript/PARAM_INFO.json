@@ -1,0 +1,20 @@
+{
+	"name": "PARAM_INFO",
+	"properties": {
+		"folder": {
+			"name": "Process"
+		},
+		"content": {
+			"query": "\nIF OBJECT_ID('PARAM_INFO', 'U') IS NOT NULL\n    DROP TABLE PARAM_INFO;\n\n\nCREATE TABLE PARAM_INFO\n(\n\n    PARAM_ID INTEGER,\n    PARAM_NAME VARCHAR(50),\n    PARAM_VALUE VARCHAR(50)\n)wITH (\n    DISTRIBUTION = REPLICATE\n);\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarketData",
+				"poolName": "StockMarketData"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

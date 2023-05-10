@@ -1,0 +1,20 @@
+{
+	"name": "Load_DateDimension",
+	"properties": {
+		"folder": {
+			"name": "Dimension"
+		},
+		"content": {
+			"query": "DECLARE @StartDate date = '20230101';\nDECLARE @CutoffDate date = DATEADD(DAY, -1, DATEADD(YEAR, 1, @StartDate));\n\nWITH seq(n) AS \n(\n  SELECT TOP (DATEDIFF(DAY, @StartDate, @CutoffDate) + 1) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n  FROM sys.all_columns ac1\n  CROSS JOIN sys.all_columns ac2\n),\nd(d) AS \n(\n  SELECT DATEADD(DAY, n, @StartDate) \n  FROM seq\n),\nsrc AS\n(\n  SELECT\n    ActualDate         = CONVERT(date, d),\n    Day          = DATEPART(DAY,       d),\n    DayName      = DATENAME(WEEKDAY,   d),\n    Week         = DATEPART(WEEK,      d),\n    ISOWeek      = DATEPART(ISO_WEEK,  d),\n    DayOfWeek    = DATEPART(WEEKDAY,   d),\n    Month        = DATEPART(MONTH,     d),\n    MonthName    = DATENAME(MONTH,     d),\n    Quarter      = DATEPART(Quarter,   d),\n    Year         = DATEPART(YEAR,      d)\n     FROM d\n)\ninsert into DateDimension\nSELECT *  from  src\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarketData",
+				"poolName": "StockMarketData"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

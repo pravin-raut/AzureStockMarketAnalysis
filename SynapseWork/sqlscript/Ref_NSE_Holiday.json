@@ -1,0 +1,20 @@
+{
+	"name": "Ref_NSE_Holiday",
+	"properties": {
+		"folder": {
+			"name": "Dimension"
+		},
+		"content": {
+			"query": "\nIF OBJECT_ID('Ref_NSE_Holiday', 'U') IS NOT NULL\n    DROP TABLE Ref_NSE_Holiday;\n\nCreate Table Ref_NSE_Holiday\n(\n    Hol_Date VARCHAR(50),\n    Day VARCHAR(50),\n    Description VARCHAR(50)\n)wITH (\n    DISTRIBUTION = REPLICATE\n);\n\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('26-Jan-2023', 'Wednesday', 'Republic Day');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('01-Mar-2023', 'Tuesday', 'Mahashivratri');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('18-Mar-2023', 'Friday', 'Holi');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('10-Apr-2023', 'Sunday', 'Ram Navami');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('14-Apr-2023', 'Thursday', 'Dr.Baba Saheb Ambedkar Jayanti/Mahavir Jayanti');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('15-Apr-2023', 'Friday', 'Good Friday');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('01-May-2023', 'Sunday', 'Maharashtra Day');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('03-May-2023', 'Tuesday', 'Id-Ul-Fitr (Ramzan ID)');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('10-Jul-2023', 'Sunday', 'Bakri Id');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('09-Aug-2023', 'Tuesday', 'Moharram');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('15-Aug-2023', 'Monday', 'Independence Day');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('31-Aug-2023', 'Wednesday', 'Ganesh Chaturthi');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('02-Oct-2023', 'Sunday', 'Mahatma Gandhi Jayanti');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('05-Oct-2023', 'Wednesday', 'Dussehra');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('26-Oct-2023', 'Wednesday', 'Diwali-Balipratipada');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('08-Nov-2023', 'Tuesday', 'Gurunanak Jayanti');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('25-Dec-2023', 'Sunday', 'Christmas');\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarketData",
+				"poolName": "StockMarketData"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,20 @@
+{
+	"name": "LoadTaskData",
+	"properties": {
+		"folder": {
+			"name": "Process"
+		},
+		"content": {
+			"query": "\ndelete from TaskData;\ninsert into TaskData\n    (TASK_NAME,FILE_DATE,TASK_STATUS,ROW_INS_TMS)\nSELECT 'DailyActivity' as TASK_NAME , case when DayOfWeek=6 then DATEADD(day,3,ActualDate)\nwhen nh.Hol_Date is not null then DATEADD(day,2,ActualDate)\n else DATEADD(day,1,ActualDate) end as FILE_DATE, 'STARTED', Getdate() as ROW_INS_TMS\nFROM DateDimension  dd\n    left outer join Ref_NSE_Holiday nh\n    ON dd.ActualDate=coalesce(DATEADD(day,-1,cast(nh.Hol_Date as date)),'2023-05-01')\nWHERE ActualDate=(Select coalesce(max(FILE_DATE),'2023-05-01')\n    from TaskData)\n    and DayOfWeek not in (1,7);\n\n\n    select * from TaskData;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarketData",
+				"poolName": "StockMarketData"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
