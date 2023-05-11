@@ -1,0 +1,428 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "syanpsedemo"
+		},
+		"syanpsedemo-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'syanpsedemo-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:syanpsedemo.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"syanpsedemo-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://demosstorage007.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/syanpsedemo-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('syanpsedemo-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/syanpsedemo-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('syanpsedemo-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Core_ActivityData')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Core Table"
+				},
+				"content": {
+					"query": "IF OBJECT_ID('Core_ActivityData', 'U') IS NOT NULL\n    DROP TABLE Core_ActivityData;\n\nCREATE TABLE Core_ActivityData (\n\t[SYMBOL] VARCHAR(50)\n\t,[SERIES] CHAR(10)\n\t,[STOCK_DATE] VARCHAR(15)\n\t,[PREV_CLOSE] DECIMAL(10, 2)\n\t,[OPEN_PRICE] DECIMAL(10, 2)\n\t,[HIGH_PRICE] DECIMAL(10, 2)\n\t,[LOW_PRICE] DECIMAL(10, 2)\n\t,[LAST_PRICE] DECIMAL(10, 2)\n\t,[CLOSE_PRICE] DECIMAL(10, 2)\n\t,[AVG_PRICE] DECIMAL(10, 2)\n\t,[TTL_TRD_QNTY] BIGINT\n\t,[TURNOVER_LACS] DECIMAL(10, 2)\n\t,[NO_OF_TRADES] BIGINT\n\t,[DELIV_QTY] BIGINT\n\t,[DELIV_PER] DECIMAL(10, 2)\n\t,ROW_INSRT_TMS datetime \n\t,ROW_UPDT_TMS datetime \n\t,ROW_INS_USR Varchar(20)\n\t,ROW_UPD_USR Varchar(20)\n)\nWITH (CLUSTERED COLUMNSTORE INDEX, DISTRIBUTION = HASH([SYMBOL]));\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarket",
+						"poolName": "StockMarket"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Core_DailyPrice')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Core Table"
+				},
+				"content": {
+					"query": "\nIF OBJECT_ID('Core_DailyPrice', 'U') IS NOT NULL\n    DROP TABLE Core_DailyPrice;\n\nCREATE TABLE Core_DailyPrice (\n\t[SYMBOL] VARCHAR(50)\n\t,[SERIES] CHAR(10)\n\t,[OPEN] DECIMAL(10, 2)\n\t,[HIGH] DECIMAL(10, 2)\n\t,[LOW] DECIMAL(10, 2)\n\t,[CLOSE] DECIMAL(10, 2)\n\t,[LAST] DECIMAL(10, 2)\n\t,[PREVCLOSE] DECIMAL(10, 2)\n\t,[TOTTRDQTY] BIGINT\n\t,[TOTTRDVAL] DECIMAL(38, 2)\n\t,[STOCK_DATE] VARCHAR(15)\n\t,[TOTALTRADES] BIGINT\n\t,[ISIN] VARCHAR(50)\n\t,ROW_INSRT_TMS datetime \n\t,ROW_UPDT_TMS datetime \n\t,ROW_INS_USR Varchar(20)\n\t,ROW_UPD_USR Varchar(20)\n\n\t)\n    WITH (CLUSTERED COLUMNSTORE INDEX, DISTRIBUTION = HASH([SYMBOL]));\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarketData",
+						"poolName": "StockMarketData"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Create_DateDimension')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Dimension"
+				},
+				"content": {
+					"query": "\nIF OBJECT_ID('DateDimension', 'U') IS NOT NULL\n    DROP TABLE DateDimension;\n\n\nCREATE TABLE dbo.DateDimension (\n    ActualDate DATE,\n    Day INT,\n    DayName NVARCHAR(50),\n    Week INT,\n    ISOWeek INT,\n    DayOfWeek INT,\n    Month INT,\n    MonthName NVARCHAR(50),\n    Quarter INT,\n    Year INT\n) WITH (\n    DISTRIBUTION = REPLICATE\n);\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarketData",
+						"poolName": "StockMarketData"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/LoadTaskData')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Process"
+				},
+				"content": {
+					"query": "\ndelete from TaskData;\ninsert into TaskData\n    (TASK_NAME,FILE_DATE,TASK_STATUS,ROW_INS_TMS)\nSELECT 'DailyActivity' as TASK_NAME , case when DayOfWeek=6 then DATEADD(day,3,ActualDate)\nwhen nh.Hol_Date is not null then DATEADD(day,2,ActualDate)\n else DATEADD(day,1,ActualDate) end as FILE_DATE, 'STARTED', Getdate() as ROW_INS_TMS\nFROM DateDimension  dd\n    left outer join Ref_NSE_Holiday nh\n    ON dd.ActualDate=coalesce(DATEADD(day,-1,cast(nh.Hol_Date as date)),'2023-05-01')\nWHERE ActualDate=(Select coalesce(max(FILE_DATE),'2023-05-01')\n    from TaskData)\n    and DayOfWeek not in (1,7);\n\n\n    select * from TaskData;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarket",
+						"poolName": "StockMarket"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Load_DateDimension')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Dimension"
+				},
+				"content": {
+					"query": "DECLARE @StartDate date = '20230101';\nDECLARE @CutoffDate date = DATEADD(DAY, -1, DATEADD(YEAR, 1, @StartDate));\n\nWITH seq(n) AS \n(\n  SELECT TOP (DATEDIFF(DAY, @StartDate, @CutoffDate) + 1) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n  FROM sys.all_columns ac1\n  CROSS JOIN sys.all_columns ac2\n),\nd(d) AS \n(\n  SELECT DATEADD(DAY, n, @StartDate) \n  FROM seq\n),\nsrc AS\n(\n  SELECT\n    ActualDate         = CONVERT(date, d),\n    Day          = DATEPART(DAY,       d),\n    DayName      = DATENAME(WEEKDAY,   d),\n    Week         = DATEPART(WEEK,      d),\n    ISOWeek      = DATEPART(ISO_WEEK,  d),\n    DayOfWeek    = DATEPART(WEEKDAY,   d),\n    Month        = DATEPART(MONTH,     d),\n    MonthName    = DATENAME(MONTH,     d),\n    Quarter      = DATEPART(Quarter,   d),\n    Year         = DATEPART(YEAR,      d)\n     FROM d\n)\ninsert into DateDimension\nSELECT *  from  src\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarketData",
+						"poolName": "StockMarketData"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Load_PARAM_INFO')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Process"
+				},
+				"content": {
+					"query": "Delete from PARAM_INFO;\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (1,'PROCESS_NAME','DailyActivity');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (1,'CONTAINER_NAME','stockmarket');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (1,'DIRECTORY_NAME','activitystockdata');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (1,'FUNCTION_NAME','GetDailyActivityStockData');\ninsert into PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES(1,'SCHEMA_NAME','dbo');\ninsert into PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES(1,'TABLE_NAME','STG_ActivityData');\n\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (2,'PROCESS_NAME','Price');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (2,'CONTAINER_NAME','stockmarket');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (2,'DIRECTORY_NAME','dailypricelist');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (2,'FUNCTION_NAME','GetDailyPriceList');\ninsert into PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES(2,'SCHEMA_NAME','dbo');\ninsert into PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES(2,'TABLE_NAME','Stg_DailyPrice');\n\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (3,'PROCESS_NAME','Nifty');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (3,'CONTAINER_NAME','stockmarket');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (3,'DIRECTORY_NAME','nifty50');\nINSERT INTO PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES (3,'FUNCTION_NAME','GetNifty50');\ninsert into PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES(3,'SCHEMA_NAME','dbo');\ninsert into PARAM_INFO (PARAM_ID,PARAM_NAME,PARAM_VALUE) VALUES(3,'TABLE_NAME','Nifty_Details');\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarket",
+						"poolName": "StockMarket"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Load_STG_ActivityData')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Staging/Load"
+				},
+				"content": {
+					"query": "COPY INTO dbo.STG_ActivityData\n(SYMBOL 1,  SERIES 2,  DATE 3,  PREV_CLOSE 4,  OPEN_PRICE 5,  HIGH_PRICE 6,  LOW_PRICE 7,  LAST_PRICE 8,  CLOSE_PRICE 9,\n  AVG_PRICE 10,  TTL_TRD_QNTY 11,  TURNOVER_LACS 12,  NO_OF_TRADES 13,  DELIV_QTY 14,  DELIV_PER 15)\nFROM 'https://demosstorage007.dfs.core.windows.net/stockmarket/activitystockdata/*.csv'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://demosstorage007.dfs.core.windows.net/stockmarket/'\n)\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarket",
+						"poolName": "StockMarket"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PARAM_INFO')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Process"
+				},
+				"content": {
+					"query": "\nIF OBJECT_ID('PARAM_INFO', 'U') IS NOT NULL\n    DROP TABLE PARAM_INFO;\n\n\nCREATE TABLE PARAM_INFO\n(\n\n    PARAM_ID INTEGER,\n    PARAM_NAME VARCHAR(50),\n    PARAM_VALUE VARCHAR(50)\n)wITH (\n    DISTRIBUTION = REPLICATE\n);\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarketData",
+						"poolName": "StockMarketData"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Ref_NSE_Holiday')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Dimension"
+				},
+				"content": {
+					"query": "\nIF OBJECT_ID('Ref_NSE_Holiday', 'U') IS NOT NULL\n    DROP TABLE Ref_NSE_Holiday;\n\nCreate Table Ref_NSE_Holiday\n(\n    Hol_Date VARCHAR(50),\n    Day VARCHAR(50),\n    Description VARCHAR(50)\n)wITH (\n    DISTRIBUTION = REPLICATE\n);\n\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('26-Jan-2023', 'Wednesday', 'Republic Day');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('01-Mar-2023', 'Tuesday', 'Mahashivratri');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('18-Mar-2023', 'Friday', 'Holi');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('10-Apr-2023', 'Sunday', 'Ram Navami');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('14-Apr-2023', 'Thursday', 'Dr.Baba Saheb Ambedkar Jayanti/Mahavir Jayanti');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('15-Apr-2023', 'Friday', 'Good Friday');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('01-May-2023', 'Sunday', 'Maharashtra Day');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('03-May-2023', 'Tuesday', 'Id-Ul-Fitr (Ramzan ID)');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('10-Jul-2023', 'Sunday', 'Bakri Id');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('09-Aug-2023', 'Tuesday', 'Moharram');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('15-Aug-2023', 'Monday', 'Independence Day');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('31-Aug-2023', 'Wednesday', 'Ganesh Chaturthi');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('02-Oct-2023', 'Sunday', 'Mahatma Gandhi Jayanti');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('05-Oct-2023', 'Wednesday', 'Dussehra');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('26-Oct-2023', 'Wednesday', 'Diwali-Balipratipada');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('08-Nov-2023', 'Tuesday', 'Gurunanak Jayanti');\ninsert into Ref_NSE_Holiday\n    (Hol_Date,Day,Description)\nvalues('25-Dec-2023', 'Sunday', 'Christmas');\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarketData",
+						"poolName": "StockMarketData"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n\tWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n\t       FORMAT_OPTIONS (\n\t\t\t FIELD_TERMINATOR = ',',\n\t\t\t USE_TYPE_DEFAULT = FALSE\n\t\t\t))\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stockmarket_demosstorage007_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stockmarket_demosstorage007_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stockmarket@demosstorage007.dfs.core.windows.net', \n\t\tTYPE = HADOOP \n\t)\nGO\n\nCREATE EXTERNAL TABLE dbo.Activity (\n\t[SYMBOL] nvarchar(20),\n\t[ SERIES] nvarchar(20),\n\t[ DATE1] nvarchar(20),\n\t[ PREV_CLOSE] float,\n\t[ OPEN_PRICE] float,\n\t[ HIGH_PRICE] float,\n\t[ LOW_PRICE] float,\n\t[ LAST_PRICE] float,\n\t[ CLOSE_PRICE] float,\n\t[ AVG_PRICE] float,\n\t[ TTL_TRD_QNTY] bigint,\n\t[ TURNOVER_LACS] float,\n\t[ NO_OF_TRADES] bigint,\n\t[ DELIV_QTY] nvarchar(20),\n\t[ DELIV_PER] nvarchar(20)\n\t)\n\tWITH (\n\tLOCATION = 'dailypricelist/Price_2023_05_04.csv',\n\tDATA_SOURCE = [stockmarket_demosstorage007_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n\n\nSELECT TOP 100 * FROM dbo.Activity\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarket",
+						"poolName": "StockMarket"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STG_ActivityData')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Staging/Create"
+				},
+				"content": {
+					"query": "\nIF OBJECT_ID('STG_ActivityData', 'U') IS NOT NULL\n    DROP TABLE STG_ActivityData;\n\nCREATE TABLE STG_ActivityData (\n\t[SYMBOL] VARCHAR(50)\n\t,[SERIES] CHAR(10)\n\t,[DATE] VARCHAR(15)\n\t,[PREV_CLOSE] DECIMAL(10, 2)\n\t,[OPEN_PRICE] DECIMAL(10, 2)\n\t,[HIGH_PRICE] DECIMAL(10, 2)\n\t,[LOW_PRICE] DECIMAL(10, 2)\n\t,[LAST_PRICE] DECIMAL(10, 2)\n\t,[CLOSE_PRICE] DECIMAL(10, 2)\n\t,[AVG_PRICE] DECIMAL(10, 2)\n\t,[TTL_TRD_QNTY] BIGINT\n\t,[TURNOVER_LACS] DECIMAL(10, 2)\n\t,[NO_OF_TRADES] BIGINT\n\t,[DELIV_QTY] Varchar(10)\n\t,[DELIV_PER] Varchar(10)\n\t,[FILENAME] Varchar(50)\n\t);\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarket",
+						"poolName": "StockMarket"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Select PARAM_INFO')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Process"
+				},
+				"content": {
+					"query": "\nselect PT.PARAM_ID,PT.[PROCESS_NAME],PT.[CONTAINER_NAME],PT.[DIRECTORY_NAME],PT.[FUNCTION_NAME],PT.[SCHEMA_NAME],PT.[TABLE_NAME] from\n(select PARAM_ID,PARAM_NAME,PARAM_VALUE\nfrom PARAM_INFO\n) as SOURCETABLE PIVOT(    MAX(PARAM_VALUE)    FOR [PARAM_NAME] IN \n([PROCESS_NAME],[CONTAINER_NAME],[DIRECTORY_NAME],[FUNCTION_NAME],[SCHEMA_NAME],[TABLE_NAME])) AS PT\nwhere Param_iD in (1,2)\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarket",
+						"poolName": "StockMarket"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Stg_DailyPrice')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Staging/Create"
+				},
+				"content": {
+					"query": "IF OBJECT_ID('Stg_DailyPrice', 'U') IS NOT NULL\n    DROP TABLE Stg_DailyPrice;\n\nCREATE TABLE Stg_DailyPrice (\n\t[SYMBOL] VARCHAR(50)\n\t,[SERIES] CHAR(10)\n\t,[OPEN] DECIMAL(10, 2)\n\t,[HIGH] DECIMAL(10, 2)\n\t,[LOW] DECIMAL(10, 2)\n\t,[CLOSE] DECIMAL(10, 2)\n\t,[LAST] DECIMAL(10, 2)\n\t,[PREVCLOSE] DECIMAL(10, 2)\n\t,[TOTTRDQTY] BIGINT\n\t,[TOTTRDVAL] DECIMAL(38, 2)\n\t,[TIMESTAMP] VARCHAR(15)\n\t,[TOTALTRADES] BIGINT\n\t,[ISIN] VARCHAR(50)\n\t,[FileName] VARCHAR(50)\n\n\t);\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarketData",
+						"poolName": "StockMarketData"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TaskData')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Process"
+				},
+				"content": {
+					"query": "\nIF OBJECT_ID('TaskData', 'U') IS NOT NULL\n    DROP TABLE TaskData;\n\n\n\nCREATE TABLE TaskData\n(\n    TAKSK_ID INT IDENTITY(1,1) ,\n    TASK_NAME varchar(50),\n    FILE_DATE VARCHAR(50),\n    TASK_STATUS VARCHAR(50),\n    ROW_INS_TMS date,\n    ROW_UPD_TMS date\n);\n\n\nselect * from TaskData",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "StockMarketData",
+						"poolName": "StockMarketData"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/StockMarket')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "centralindia"
+		}
+	]
+}
