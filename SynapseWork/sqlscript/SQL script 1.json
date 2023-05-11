@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n\tWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n\t       FORMAT_OPTIONS (\n\t\t\t FIELD_TERMINATOR = ',',\n\t\t\t USE_TYPE_DEFAULT = FALSE\n\t\t\t))\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stockmarket_demosstorage007_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stockmarket_demosstorage007_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stockmarket@demosstorage007.dfs.core.windows.net', \n\t\tTYPE = HADOOP \n\t)\nGO\n\nCREATE EXTERNAL TABLE dbo.Activity (\n\t[SYMBOL] nvarchar(20),\n\t[ SERIES] nvarchar(20),\n\t[ DATE1] nvarchar(20),\n\t[ PREV_CLOSE] float,\n\t[ OPEN_PRICE] float,\n\t[ HIGH_PRICE] float,\n\t[ LOW_PRICE] float,\n\t[ LAST_PRICE] float,\n\t[ CLOSE_PRICE] float,\n\t[ AVG_PRICE] float,\n\t[ TTL_TRD_QNTY] bigint,\n\t[ TURNOVER_LACS] float,\n\t[ NO_OF_TRADES] bigint,\n\t[ DELIV_QTY] nvarchar(20),\n\t[ DELIV_PER] nvarchar(20)\n\t)\n\tWITH (\n\tLOCATION = 'dailypricelist/Price_2023_05_04.csv',\n\tDATA_SOURCE = [stockmarket_demosstorage007_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n\n\nSELECT TOP 100 * FROM dbo.Activity\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "StockMarket",
+				"poolName": "StockMarket"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
