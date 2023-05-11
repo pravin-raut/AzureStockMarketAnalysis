@@ -6,6 +6,7 @@ This project is aimed at analyzing stock market data using Python libraries and 
 
 
 ## Architecture Diagram
+![image](https://github.com/pravin-raut/AzureStockMarketAnalysis/assets/65663124/e33f5819-6555-4bb8-b12e-cb70c17fd9f3)
 
 
 ## Project Components
