@@ -5,13 +5,13 @@
 			"name": "Process"
 		},
 		"content": {
-			"query": "\nselect PT.PARAM_ID,PT.[PROCESS_NAME],PT.[CONTAINER_NAME],PT.[DIRECTORY_NAME],PT.[FUNCTION_NAME],PT.[SCHEMA_NAME],PT.[TABLE_NAME] from\n(select PARAM_ID,PARAM_NAME,PARAM_VALUE\nfrom PARAM_INFO\n) as SOURCETABLE PIVOT(    MAX(PARAM_VALUE)    FOR [PARAM_NAME] IN \n([PROCESS_NAME],[CONTAINER_NAME],[DIRECTORY_NAME],[FUNCTION_NAME],[SCHEMA_NAME],[TABLE_NAME])) AS PT\nwhere Param_iD in (1,2)",
+			"query": "\nselect PT.PARAM_ID,PT.[PROCESS_NAME],PT.[CONTAINER_NAME],PT.[DIRECTORY_NAME],PT.[FUNCTION_NAME],PT.[SCHEMA_NAME],PT.[TABLE_NAME] from\n(select PARAM_ID,PARAM_NAME,PARAM_VALUE\nfrom PARAM_INFO\n) as SOURCETABLE PIVOT(    MAX(PARAM_VALUE)    FOR [PARAM_NAME] IN \n([PROCESS_NAME],[CONTAINER_NAME],[DIRECTORY_NAME],[FUNCTION_NAME],[SCHEMA_NAME],[TABLE_NAME])) AS PT\nwhere Param_iD in (1,2)\n\n",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "StockMarketData",
-				"poolName": "StockMarketData"
+				"databaseName": "StockMarket",
+				"poolName": "StockMarket"
 			},
 			"resultLimit": 5000
 		},

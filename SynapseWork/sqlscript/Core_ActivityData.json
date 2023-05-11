@@ -10,8 +10,8 @@
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "StockMarketData",
-				"poolName": "StockMarketData"
+				"databaseName": "StockMarket",
+				"poolName": "StockMarket"
 			},
 			"resultLimit": 5000
 		},

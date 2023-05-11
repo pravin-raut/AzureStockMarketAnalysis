@@ -2,16 +2,16 @@
 	"name": "STG_ActivityData",
 	"properties": {
 		"folder": {
-			"name": "Staging"
+			"name": "Staging/Create"
 		},
 		"content": {
-			"query": "\nIF OBJECT_ID('STG_ActivityData', 'U') IS NOT NULL\n    DROP TABLE STG_ActivityData;\n\nCREATE TABLE STG_ActivityData (\n\t[SYMBOL] VARCHAR(50)\n\t,[SERIES] CHAR(10)\n\t,[DATE] VARCHAR(15)\n\t,[PREV_CLOSE] DECIMAL(10, 2)\n\t,[OPEN_PRICE] DECIMAL(10, 2)\n\t,[HIGH_PRICE] DECIMAL(10, 2)\n\t,[LOW_PRICE] DECIMAL(10, 2)\n\t,[LAST_PRICE] DECIMAL(10, 2)\n\t,[CLOSE_PRICE] DECIMAL(10, 2)\n\t,[AVG_PRICE] DECIMAL(10, 2)\n\t,[TTL_TRD_QNTY] BIGINT\n\t,[TURNOVER_LACS] DECIMAL(10, 2)\n\t,[NO_OF_TRADES] BIGINT\n\t,[DELIV_QTY] BIGINT\n\t,[DELIV_PER] DECIMAL(10, 2)\n\t,[FileName] VARCHAR(50)\n\t);\n\n",
+			"query": "\nIF OBJECT_ID('STG_ActivityData', 'U') IS NOT NULL\n    DROP TABLE STG_ActivityData;\n\nCREATE TABLE STG_ActivityData (\n\t[SYMBOL] VARCHAR(50)\n\t,[SERIES] CHAR(10)\n\t,[DATE] VARCHAR(15)\n\t,[PREV_CLOSE] DECIMAL(10, 2)\n\t,[OPEN_PRICE] DECIMAL(10, 2)\n\t,[HIGH_PRICE] DECIMAL(10, 2)\n\t,[LOW_PRICE] DECIMAL(10, 2)\n\t,[LAST_PRICE] DECIMAL(10, 2)\n\t,[CLOSE_PRICE] DECIMAL(10, 2)\n\t,[AVG_PRICE] DECIMAL(10, 2)\n\t,[TTL_TRD_QNTY] BIGINT\n\t,[TURNOVER_LACS] DECIMAL(10, 2)\n\t,[NO_OF_TRADES] BIGINT\n\t,[DELIV_QTY] Varchar(10)\n\t,[DELIV_PER] Varchar(10)\n\t,[FILENAME] Varchar(50)\n\t);\n\n",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
-				"poolName": "Built-in"
+				"databaseName": "StockMarket",
+				"poolName": "StockMarket"
 			},
 			"resultLimit": 5000
 		},
