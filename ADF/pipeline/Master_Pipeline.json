@@ -1,0 +1,97 @@
+{
+	"name": "Master_Pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "ReadParamFromDB",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_Syanpase",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "\nselect PT.PARAM_ID,PT.[PROCESS_NAME],PT.[CONTAINER_NAME],PT.[DIRECTORY_NAME],PT.[FUNCTION_NAME],PT.[SCHEMA_NAME],PT.[TABLE_NAME] from\n(select PARAM_ID,PARAM_NAME,PARAM_VALUE\nfrom PARAM_INFO\n) as SOURCETABLE PIVOT(    MAX(PARAM_VALUE)    FOR [PARAM_NAME] IN \n([PROCESS_NAME],[CONTAINER_NAME],[DIRECTORY_NAME],[FUNCTION_NAME],[SCHEMA_NAME],[TABLE_NAME])) AS PT\nwhere Param_iD in (1)"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "LoopThroughFiles",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "ReadParamFromDB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('ReadParamFromDB').output.resultSets[0].rows\r\n",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "StockFilesGeneration",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "StockMarketDataToAzure",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"PROCESS_NAME": {
+										"value": "@item().PROCESS_NAME",
+										"type": "Expression"
+									},
+									"DIRECTORY_NAME": {
+										"value": "@item().DIRECTORY_NAME",
+										"type": "Expression"
+									},
+									"CONTAINER_NAME": {
+										"value": "@item().CONTAINER_NAME",
+										"type": "Expression"
+									},
+									"FUNCTION_NAME": {
+										"value": "@item().FUNCTION_NAME",
+										"type": "Expression"
+									},
+									"SCHEMA_NAME": {
+										"value": "@item().SCHEMA_NAME",
+										"type": "Expression"
+									},
+									"TABLE_NAME": {
+										"value": "@item().TABLE_NAME",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-05-11T17:25:31Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

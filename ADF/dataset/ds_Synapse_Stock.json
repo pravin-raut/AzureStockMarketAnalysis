@@ -1,0 +1,30 @@
+{
+	"name": "ds_Synapse_Stock",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_Syanpase",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"SCHEMA_NAME": {
+				"type": "string",
+				"defaultValue": "dbo"
+			},
+			"TABLE_NAME": {
+				"type": "string",
+				"defaultValue": "ActivityData"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().TABLE_NAME",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

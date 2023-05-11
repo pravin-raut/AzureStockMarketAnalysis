@@ -1,0 +1,44 @@
+{
+	"name": "ds_Stock_Market",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_Http",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"function_name": {
+				"type": "string",
+				"defaultValue": "GetDailyActivityStockData"
+			},
+			"day": {
+				"type": "string",
+				"defaultValue": "09"
+			},
+			"Month": {
+				"type": "string",
+				"defaultValue": "05"
+			},
+			"Year": {
+				"type": "string",
+				"defaultValue": "2023"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@concat(dataset().function_name,'?env=dev&day=',dataset().day,'&month=',dataset().Month,'&year=',dataset().Year)",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

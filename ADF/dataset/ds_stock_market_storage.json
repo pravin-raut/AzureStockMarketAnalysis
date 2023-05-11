@@ -1,0 +1,48 @@
+{
+	"name": "ds_stock_market_storage",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"CONTAINER_NAME": {
+				"type": "string",
+				"defaultValue": "stockmarket"
+			},
+			"DIRECTORY_NAME": {
+				"type": "string",
+				"defaultValue": "activitystockdata"
+			},
+			"FILE_NAME": {
+				"type": "string",
+				"defaultValue": "Activity.csv"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().FILE_NAME",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().DIRECTORY_NAME",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().CONTAINER_NAME",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "",
+			"firstRowAsHeader": true,
+			"quoteChar": ""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,9 @@
+{
+	"name": "adfinstance007",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "bfcef25e-f1f1-4a1c-a50a-da06ca11410f",
+		"tenantId": "cc5fcbb6-dce0-40b4-ba9f-40a62abbc6ed"
+	}
+}

@@ -1,0 +1,273 @@
+{
+	"name": "StockMarketDataToAzure",
+	"properties": {
+		"activities": [
+			{
+				"name": "cp_stockdata_to_storage",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Get_Task_Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_Stock_Market",
+						"type": "DatasetReference",
+						"parameters": {
+							"function_name": {
+								"value": "@pipeline().parameters.FUNCTION_NAME",
+								"type": "Expression"
+							},
+							"day": {
+								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].day",
+								"type": "Expression"
+							},
+							"Month": {
+								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].month",
+								"type": "Expression"
+							},
+							"Year": {
+								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].year",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_stock_market_storage",
+						"type": "DatasetReference",
+						"parameters": {
+							"CONTAINER_NAME": {
+								"value": "@pipeline().parameters.CONTAINER_NAME",
+								"type": "Expression"
+							},
+							"DIRECTORY_NAME": {
+								"value": "@pipeline().parameters.DIRECTORY_NAME",
+								"type": "Expression"
+							},
+							"FILE_NAME": {
+								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].FileName",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Get_Task_Table",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Insert Task Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_Syanpase",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"parameters": [
+								{
+									"name": "PROCESS_NAME",
+									"type": "String",
+									"value": {
+										"value": "@pipeline().parameters.PROCESS_NAME",
+										"type": "Expression"
+									},
+									"direction": "Input"
+								}
+							],
+							"type": "Query",
+							"text": "SELECT CONCAT(Task_Name,'_',replace(FILE_DATE,'-','_'),'.csv') as FileName,\n    RIGHT(concat(0,DAY(FILE_DATE)),2) AS day,\n    RIGHT(concat(0,month(FILE_DATE)),2) AS month,\n    year(FILE_DATE) as year\nfrom TaskData\nwhere TASK_STATUS='STARTED'\nand Task_Name=@PROCESS_NAME\n"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Update_Task_Success",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "cp_stockdata_to_storage",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_Syanpase",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "update TaskData\nset\nROW_UPD_TMS=GETDATE(),\nTASK_STATUS='COMPLETED'\nwhere TASK_STATUS='STARTED'"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Update_Task_Failed",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "cp_stockdata_to_storage",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_Syanpase",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "update TaskData\nset\nROW_UPD_TMS=GETDATE(),\nTASK_STATUS='FAILED'\nwhere TASK_STATUS='STARTED'"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Insert Task Table",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_Syanpase",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"parameters": [
+								{
+									"name": "PROCESS_NAME",
+									"type": "String",
+									"value": {
+										"value": "@pipeline().parameters.PROCESS_NAME",
+										"type": "Expression"
+									},
+									"direction": "Input"
+								}
+							],
+							"type": "Query",
+							"text": "INSERT INTO TaskData (\n\tTASK_NAME\n\t,FILE_DATE\n\t,TASK_STATUS\n\t,ROW_INS_TMS\n\t)\nSELECT @PROCESS_NAME AS TASK_NAME\n\t,CASE \n\t\tWHEN DayOfWeek = 6\n\t\t\tTHEN DATEADD(day, 3, ActualDate)\n\t\tWHEN nh.Hol_Date IS NOT NULL\n\t\t\tTHEN DATEADD(day, 2, ActualDate)\n\t\tELSE DATEADD(day, 1, ActualDate)\n\t\tEND AS FILE_DATE\n\t,'STARTED'\n\t,Getdate() AS ROW_INS_TMS\nFROM DateDimension dd\nLEFT OUTER JOIN Ref_NSE_Holiday nh ON dd.ActualDate = coalesce(DATEADD(day, - 1, cast(nh.Hol_Date AS DATE)), '2023-05-01')\nWHERE ActualDate = (\n\t\tSELECT coalesce(max(FILE_DATE), '2023-05-01')\n\t\tFROM TaskData where  TASK_NAME=@PROCESS_NAME\n\t\t)\n\tAND DayOfWeek NOT IN (\n\t\t1\n\t\t,7\n\t\t)\n\t;\n"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"PROCESS_NAME": {
+				"type": "string"
+			},
+			"DIRECTORY_NAME": {
+				"type": "string"
+			},
+			"CONTAINER_NAME": {
+				"type": "string"
+			},
+			"FUNCTION_NAME": {
+				"type": "string"
+			},
+			"SCHEMA_NAME": {
+				"type": "string"
+			},
+			"TABLE_NAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-11T17:25:31Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
