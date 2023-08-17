@@ -1,0 +1,9 @@
+{
+	"name": "stockdatamovement",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "142e7d1e-3a1c-47d9-b72d-75e8ec4276dd",
+		"tenantId": "cc5fcbb6-dce0-40b4-ba9f-40a62abbc6ed"
+	}
+}
