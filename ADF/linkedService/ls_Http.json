@@ -1,13 +1,13 @@
 {
 	"name": "ls_Http",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "HttpServer",
 		"typeProperties": {
-			"url": "https://stockmarketextraction.azurewebsites.net/api/",
+			"url": "https://stockdatafetching.azurewebsites.net/api/readfromyfinance/",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
