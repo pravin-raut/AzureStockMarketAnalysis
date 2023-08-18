@@ -8,19 +8,19 @@
 		"parameters": {
 			"function_name": {
 				"type": "string",
-				"defaultValue": "GetDailyActivityStockData"
+				"defaultValue": "readfromyfinance"
 			},
 			"ticker": {
 				"type": "string",
-				"defaultValue": "09"
+				"defaultValue": "^NSEI"
 			},
 			"start_day": {
 				"type": "string",
-				"defaultValue": "05"
+				"defaultValue": "2021-07-10"
 			},
 			"end_day": {
 				"type": "string",
-				"defaultValue": "2023"
+				"defaultValue": "2023-07-10"
 			}
 		},
 		"annotations": [],
