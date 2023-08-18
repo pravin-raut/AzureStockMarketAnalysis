@@ -20,7 +20,6 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [],
 				"typeProperties": {
 					"source": {
 						"type": "DelimitedTextSource",
@@ -63,15 +62,15 @@
 								"type": "Expression"
 							},
 							"ticker": {
-								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].day",
+								"value": "@pipeline().parameters.ticker",
 								"type": "Expression"
 							},
 							"start_day": {
-								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].month",
+								"value": "@pipeline().parameters.start_day",
 								"type": "Expression"
 							},
 							"end_day": {
-								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].year",
+								"value": "@pipeline().parameters.end_day",
 								"type": "Expression"
 							}
 						}
@@ -263,6 +262,15 @@
 				"type": "string"
 			},
 			"TABLE_NAME": {
+				"type": "string"
+			},
+			"ticker": {
+				"type": "string"
+			},
+			"start_day": {
+				"type": "string"
+			},
+			"end_day": {
 				"type": "string"
 			}
 		},
