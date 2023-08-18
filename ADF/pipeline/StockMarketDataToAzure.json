@@ -172,7 +172,10 @@
 								{
 									"name": "PROCESS_NAME",
 									"type": "String",
-									"value": "@pipeline().parameters.PROCESS_NAME",
+									"value": {
+										"value": "@pipeline().parameters.PROCESS_NAME",
+										"type": "Expression"
+									},
 									"direction": "Input"
 								}
 							],
