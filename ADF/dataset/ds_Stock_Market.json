@@ -10,15 +10,15 @@
 				"type": "string",
 				"defaultValue": "GetDailyActivityStockData"
 			},
-			"day": {
+			"ticker": {
 				"type": "string",
 				"defaultValue": "09"
 			},
-			"Month": {
+			"start_day": {
 				"type": "string",
 				"defaultValue": "05"
 			},
-			"Year": {
+			"end_day": {
 				"type": "string",
 				"defaultValue": "2023"
 			}
@@ -29,7 +29,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "?ticker=^NSEI&start_day=2021-07-10&end_day=2023-07-10\n",
+					"value": "?ticker=@dataset().ticker&start_day=@dataset().start_day&end_day=@dataset().end_day\r\n",
 					"type": "Expression"
 				}
 			},

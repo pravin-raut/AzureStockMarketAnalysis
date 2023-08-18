@@ -62,15 +62,15 @@
 								"value": "@pipeline().parameters.FUNCTION_NAME",
 								"type": "Expression"
 							},
-							"day": {
+							"ticker": {
 								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].day",
 								"type": "Expression"
 							},
-							"Month": {
+							"start_day": {
 								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].month",
 								"type": "Expression"
 							},
-							"Year": {
+							"end_day": {
 								"value": "@activity('Get_Task_Table').output.resultSets[0].rows[0].year",
 								"type": "Expression"
 							}
