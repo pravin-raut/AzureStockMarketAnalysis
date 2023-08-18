@@ -29,7 +29,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "?ticker='^NSEI'&start_day='2021-07-10'&end_day='2023-07-10'\n",
+					"value": "?ticker=^NSEI&start_day=2021-07-10&end_day=2023-07-10\n",
 					"type": "Expression"
 				}
 			},
