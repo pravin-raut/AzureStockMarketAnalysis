@@ -1,0 +1,6 @@
+{
+	"name": "ir-sqlserverlinking",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
