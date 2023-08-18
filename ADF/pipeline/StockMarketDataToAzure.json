@@ -172,7 +172,8 @@
 								{
 									"name": "PROCESS_NAME",
 									"type": "String",
-									"value": "@pipeline().parameters.PROCESS_NAME"
+									"value": "@pipeline().parameters.PROCESS_NAME",
+									"direction": "Input"
 								}
 							],
 							"type": "Query",
