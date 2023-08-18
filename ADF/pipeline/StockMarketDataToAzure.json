@@ -239,7 +239,7 @@
 								}
 							],
 							"type": "Query",
-							"text": "insert into TaskData\n    (TASK_NAME,FILE_DATE,TASK_STATUS,ROW_INS_TMS)\nSELECT 'DailyActivity' as TASK_NAME , case when DayOfWeek=6 then DATEADD(day,3,ActualDate)\nwhen nh.Hol_Date is not null then DATEADD(day,2,ActualDate)\n else DATEADD(day,1,ActualDate) end as FILE_DATE, 'STARTED', Getdate() as ROW_INS_TMS\nFROM DateDimension  dd\n    left outer join Ref_NSE_Holiday nh\n    ON dd.ActualDate=coalesce(DATEADD(day,-1,cast(nh.Hol_Date as date)),DATEADD(day,-10,FOrmat(GETDATE(),'yyyy-MM-dd')))\nWHERE ActualDate=(Select coalesce(max(FILE_DATE),DATEADD(day,-10,FOrmat(GETDATE(),'yyyy-MM-dd')))\n    from TaskData)\n    and DayOfWeek not in (1,7);"
+							"text": "insert into TaskData\n    (TASK_NAME,FILE_DATE,TASK_STATUS,ROW_INS_TMS)\nSELECT @PROCESS_NAME as TASK_NAME , case when DayOfWeek=6 then DATEADD(day,3,ActualDate)\nwhen nh.Hol_Date is not null then DATEADD(day,2,ActualDate)\n else DATEADD(day,1,ActualDate) end as FILE_DATE, 'STARTED', Getdate() as ROW_INS_TMS\nFROM DateDimension  dd\n    left outer join Ref_NSE_Holiday nh\n    ON dd.ActualDate=coalesce(DATEADD(day,-1,cast(nh.Hol_Date as date)),DATEADD(day,-10,FOrmat(GETDATE(),'yyyy-MM-dd')))\nWHERE ActualDate=(Select coalesce(max(FILE_DATE),DATEADD(day,-10,FOrmat(GETDATE(),'yyyy-MM-dd')))\n    from TaskData)\n    and DayOfWeek not in (1,7)\n\t\n\t;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
