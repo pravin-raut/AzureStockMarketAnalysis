@@ -29,7 +29,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "?ticker=@dataset().ticker&start_day=@dataset().start_day&end_day=@dataset().end_day\r\n",
+					"value": "@concat('?ticker=', dataset().ticker, '&start_day=', dataset().start_day, '&end_day=', dataset().end_day)\n",
 					"type": "Expression"
 				}
 			},
