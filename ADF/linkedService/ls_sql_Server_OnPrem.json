@@ -1,0 +1,16 @@
+{
+	"name": "ls_sql_Server_OnPrem",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=False;data source=PRAVIN-DELL;initial catalog=StockMarket;user id=stock",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJjN2Y3OGVjZC00YmFlLTRiZDAtYmMzMy0xOTQ3N2NjOTBhNjMiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "ir-sqlserverlinking",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
